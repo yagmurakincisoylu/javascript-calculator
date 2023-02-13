@@ -14,41 +14,47 @@
 <body>
   <div class="calculator-container">
     <div class="display-container">
-      <!-- <i className="fa-regular fa-lightbulb"></i>
-      <i className="fa-solid fa-lightbulb"></i> -->
+
+      <div class="theme-icon-container">
+        <i class="fa-regular fa-lightbulb" data-theme></i>
+      </div>
+
       <div id="currentInput"></div>
       <div id="prevInput">0</div>
+
     </div>
     <div class="button-container">
-      <button data-clear-entry class="row-clr span-two-row">CE</button>
-      <button data-clear-all class="row-clr">C</button>
-      <button data-operations="/" class="column-clr">
+
+      <button data-clear-entry class="blue-clr span-two-row">CE</button>
+      <button data-clear-all class="blue-clr">C</button>
+      <button data-operations="/" class="red-clr">
         <i class="fa-solid fa-divide"></i>
       </button>
       <button data-numbers>7</button>
       <button data-numbers>8</button>
       <button data-numbers>9</button>
-      <button data-operations="*" class="column-clr">
+      <button data-operations="*" class="red-clr">
         <i class="fa-solid fa-xmark"></i>
       </button>
       <button data-numbers>4</button>
       <button data-numbers>5</button>
       <button data-numbers>6</button>
-      <button data-operations="-" class="column-clr">
+      <button data-operations="-" class="red-clr">
         <i class="fa-solid fa-minus"></i>
       </button>
       <button data-numbers>1</button>
       <button data-numbers>2</button>
       <button data-numbers>3</button>
-      <button data-operations="+" class="column-clr">
+      <button data-operations="+" class="red-clr">
         <i class="fa-solid fa-plus"></i>
       </button>
-      <button data-plus-minus>
+      <button data-plus-minus class="blue-clr">
         <i class="fa-solid fa-plus-minus"></i>
       </button>
       <button data-numbers>0</button>
       <button data-numbers>.</button>
-      <button data-equals class="column-clr"><i class="fa-solid fa-equals"></i></button>
+      <button data-equals class="red-clr"><i class="fa-solid fa-equals"></i></button>
+    
     </div>
   </div>
   

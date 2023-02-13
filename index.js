@@ -4,38 +4,70 @@ const currentInput = document.getElementById("currentInput");
 let currentInputArray = [];
 let prevInputArray = [];
 let lastButtonPressed = "";
-//let lastOperationPressed = "";
 const operationsArray = ["+", "-", "/" , "*"];
 
 // functions
 
 const appendInput = input => {
+  // if last input is an operator
   let isLastInputOperation = operationsArray.includes(currentInputArray[currentInputArray.length - 1]);
+  // if last button pressed is an operator
   let isLastButtonPressedOperation = operationsArray.includes(lastButtonPressed);
+  // if there is more than one operator
   let hasAlreadyOperation = currentInputArray.some(element => operationsArray.includes(element));
 
-  // if input = operator
+
+  if(currentInputArray[currentInputArray.length - 1] === "=") {
+    currentInputArray = [];
+    if(!operationsArray.includes(input)) {
+      prevInputArray = [];
+      prevInputArray.push(input);
+      displayResult();
+      return;
+    } else {
+      currentInputArray.push(prevInputArray[0], input);
+    }
+  }
+
+
   if(operationsArray.includes(input)) {
+    // if input = operator
     if(hasAlreadyOperation) {
       if(isLastInputOperation && !isLastButtonPressedOperation) {
-        currentInputArray = [...currentInputArray, ...prevInputArray];
-        currentInputArray.push(input);
+        // to calculate
+        currentInputArray = [...currentInputArray, ...prevInputArray, ...input];
         lastButtonPressed = input;
-        calculate();
+        calculate(false);
       } else {
+        // to change last operator
         currentInputArray[currentInputArray.length - 1] = input;
         lastButtonPressed = input;
       }
     } else {
-      currentInputArray = [...currentInputArray, ...prevInputArray];
-      currentInputArray.push(input);
+      // if there is only one operator
+      currentInputArray = [...currentInputArray, ...prevInputArray, ...input];
       lastButtonPressed = input;
-      //lastOperationPressed = input;
     }
   // if input = number
+  } else if(input === "=") {
+    currentInputArray = [...currentInputArray, ...prevInputArray];
+    calculate(true);
   } else {
     if(isLastInputOperation && operationsArray.includes(lastButtonPressed)) {
       prevInputArray = [];
+    }
+
+    // if first input is "."
+    if(input === "." && prevInputArray.length === 0) {
+      prevInputArray.push("0.");
+      lastButtonPressed = input;
+      displayResult();
+      return;
+    }
+
+    // if "." has pressed more than one time
+    if(prevInputArray.includes(".") && isNaN(parseFloat(input))) {
+      return;
     }
     lastButtonPressed = input;
     prevInputArray.push(input);
@@ -52,14 +84,16 @@ const chooseOperation = operation => {
 }
 
 const clearEntry = () => {
-  if(prevInputArray.length === 0) {
+  let length = prevInputArray.length;
+  if(length === 0) {
     return;
-  } else if(prevInputArray.length === 1 ) {
+  } else if(length === 1 ) {
     prevInputArray = [];
   } else {
     prevInputArray = [...prevInputArray.slice(0, -1)];
   }
 
+  resizeText(length);
   displayResult();
 }
 
@@ -69,42 +103,71 @@ const clearAll = () => {
   currentInputArray = [];
   prevInputArray = [];
   lastButtonPressed = "";
+  resizeText(prevInputArray.length);
 }
 
-const calculate = () => {
-  let result = currentInputArray.join("");
+const calculate = (bool) => {
+  let result;
+  let indexOfOperator;
+  let lastOperator;
+
+  // if equals button's pressed: 
+  if(bool) {
+    lastOperator = "=";
+    currentInputArray.map((element, index) => {
+      if(operationsArray.includes(element)) {
+        indexOfOperator = index;
+        return;
+      }
+    });
+  } else {
+    lastOperator = currentInputArray.pop();
+    // to find the operator index:
+    currentInputArray.map((element, index) => {
+      if(operationsArray.includes(element)) {
+        indexOfOperator = index;
+        return;
+      }
+    });
+  }
+
+  // slice the array into three peaces to calculate result:
+  let firstNumber = parseFloat(currentInputArray.slice(0, indexOfOperator).join(""));
+  let secondNumber = parseFloat(currentInputArray.slice((indexOfOperator + 1)).join(""));
+  let operator = currentInputArray[indexOfOperator];
+
+  // to calculate:
+  switch(operator) {
+    case "+":
+      result = firstNumber + secondNumber
+      break;
+
+    case "-":
+      result = firstNumber - secondNumber
+      break;
+
+    case "/":
+      result = firstNumber / secondNumber
+      break;
+
+    case "*":
+      result = firstNumber * secondNumber
+      break;
+
+    default:
+      break;
+  }
+
   
-
-  //const prevNumber = parseFloat(prevInputArray.join(""));
-  //const currentNumber = parseFloat(currentInputArray.join(""));
-
-  // switch(lastOperationPressed) {
-  //   case "+":
-  //     result = prevNumber + currentNumber
-  //     break;
-
-  //   case "-":
-  //     result = prevNumber - currentNumber
-  //     break;
-
-  //   case "/":
-  //     result = prevNumber / currentNumber
-  //     break;
-
-  //   case "*":
-  //     result = prevNumber * currentNumber
-  //     break;
-
-  //   default:
-
-  // }
-
-  console.log(result)
-  // currentInputArray = [];
-  // prevInputArray = [];
-  // prevInputArray.push(result)
-  // currentInputArray.push(result);
-  // currentInputArray.push(lastButtonPressed);
+  if(lastOperator === "=") {
+    currentInputArray.push("=");
+  } else {
+    currentInputArray = [];
+    currentInputArray.push(result, lastOperator);
+  }
+  
+  prevInputArray = [];
+  prevInputArray.push(result);
   displayResult();
 }
 
@@ -117,6 +180,37 @@ const displayResult = () => {
   currentInput.textContent = currentInputArray.join("").replaceAll("/", "÷").replaceAll("*", "x");;
 }
 
+const changePlusMinus = () => {
+  let num = prevInputArray[0];
+  if(!prevInputArray.length) {
+    return;
+  } else {
+    if(num < 0) {
+      prevInputArray[0] = Math.abs(prevInputArray[0])
+    } else {
+      prevInputArray[0] = -Math.abs(prevInputArray[0])
+    }
+  }
+  
+  displayResult()
+}
+
+const resizeText = (length) => {
+  if(length < 6) {
+  prevInput.style.fontSize = "3rem";
+  } else if(length > 6 && length < 9) {
+    prevInput.style.fontSize = "2rem";
+  } else if(length > 9 && length < 12) {
+    prevInput.style.fontSize = "1.5rem";
+  } else if(length > 12) {
+    prevInput.style.fontSize = "1rem";
+  }
+}
+
+const changeTheme = () => {
+  document.body.classList.toggle('light-mode');
+}
+
 // buttons
 
 // numbers button
@@ -124,18 +218,11 @@ const numberButtons = document.querySelectorAll("[data-numbers]");
 
 numberButtons.forEach(button => {
   button.addEventListener("click", () => {
-    const prevInputLength = prevInput.textContent.length;
-
-    if(prevInputLength > 6 && prevInputLength < 9) {
-      prevInput.style.fontSize = "2rem";
-    } else if(prevInputLength > 9 && prevInputLength < 12) {
-      prevInput.style.fontSize = "1.5rem";
-    } else if(prevInputLength > 12) {
-      prevInput.style.fontSize = "1rem";
-    } if(prevInputLength === 17) {
+    let prevInputLength = prevInput.textContent.length;
+    if(prevInputLength === 17) {
       return;
     }
-
+    resizeText(prevInputLength);
     const number = button.textContent;
     appendInput(number);
   })
@@ -151,6 +238,11 @@ operationButtons.forEach(button => {
   })
 })
 
+// plus-minus button
+
+const plusMinusButton = document.querySelector("[data-plus-minus]");
+plusMinusButton.addEventListener("click", changePlusMinus);
+
 // clear-all button
 
 const clearAllButton = document.querySelector("[data-clear-all]");
@@ -164,4 +256,9 @@ clearEntryButton.addEventListener("click", clearEntry);
 // equals button
 
 const equalsButton = document.querySelector("[data-equals]");
-equalsButton.addEventListener("click", calculate);
+equalsButton.addEventListener("click", () => appendInput("="));
+
+// change-theme button
+
+const changeThemeButton = document.querySelector("[data-theme]");
+changeThemeButton.addEventListener("click", changeTheme)
