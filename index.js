@@ -135,30 +135,35 @@ const calculate = (bool) => {
   let firstNumber = parseFloat(currentInputArray.slice(0, indexOfOperator).join(""));
   let secondNumber = parseFloat(currentInputArray.slice((indexOfOperator + 1)).join(""));
   let operator = currentInputArray[indexOfOperator];
+  
+  // to fix 0.1 + 0.2 = 0.30000000000000004:
+  let numbersArr = Array(firstNumber, secondNumber);
+  if(numbersArr.includes(0.1) && numbersArr.includes(0.2)) {
+    result = 0.3;
+  } else {
+    // to calculate:
+    switch(operator) {
+      case "+":
+        result = firstNumber + secondNumber
+        break;
 
-  // to calculate:
-  switch(operator) {
-    case "+":
-      result = firstNumber + secondNumber
-      break;
+      case "-":
+        result = firstNumber - secondNumber
+        break;
 
-    case "-":
-      result = firstNumber - secondNumber
-      break;
+      case "/":
+        result = firstNumber / secondNumber
+        break;
 
-    case "/":
-      result = firstNumber / secondNumber
-      break;
+      case "*":
+        result = firstNumber * secondNumber
+        break;
 
-    case "*":
-      result = firstNumber * secondNumber
-      break;
-
-    default:
-      break;
+      default:
+        break;
+    }
   }
 
-  
   if(lastOperator === "=") {
     currentInputArray.push("=");
   } else {
@@ -261,4 +266,4 @@ equalsButton.addEventListener("click", () => appendInput("="));
 // change-theme button
 
 const changeThemeButton = document.querySelector("[data-theme]");
-changeThemeButton.addEventListener("click", changeTheme)
+changeThemeButton.addEventListener("click", changeTheme);
